@@ -667,6 +667,9 @@ int do_bootm_states(struct cmd_tbl *cmdtp, int flag, int argc,
 	boot_os_fn *boot_fn;
 	ulong iflag = 0;
 	int ret = 0, need_boot_fn;
+#ifdef CONFIG_PCI_CLEANUP
+	extern void pci_cleanup(void);
+#endif
 
 	images->state |= states;
 
@@ -712,6 +715,10 @@ int do_bootm_states(struct cmd_tbl *cmdtp, int flag, int argc,
 		ret = boot_relocate_fdt(&images->lmb, &images->ft_addr,
 					&images->ft_len);
 	}
+#endif
+
+#ifdef CONFIG_PCI_CLEANUP
+	pci_cleanup();
 #endif
 
 	/* From now on, we need the OS boot function */

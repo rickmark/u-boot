@@ -453,8 +453,9 @@ KBUILD_AFLAGS	+= $(call cc-option,-fno-PIE)
 # Read UBOOTRELEASE from include/config/uboot.release (if it exists)
 UBOOTRELEASE = $(shell cat include/config/uboot.release 2> /dev/null)
 UBOOTVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
+HALRELEASE = $(shell cat include/config/HAL.release 2> /dev/null)
 
-export VERSION PATCHLEVEL SUBLEVEL UBOOTRELEASE UBOOTVERSION
+export VERSION PATCHLEVEL SUBLEVEL UBOOTRELEASE UBOOTVERSION HALRELEASE
 export ARCH CPU BOARD VENDOR SOC CPUDIR BOARDDIR
 export CONFIG_SHELL HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE AS LD CC
 export CPP AR NM LDR STRIP OBJCOPY OBJDUMP KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS
@@ -1831,6 +1832,13 @@ endef
 include/config/uboot.release: include/config/auto.conf FORCE
 	$(call filechk,uboot.release)
 
+define filechk_HAL.release
+	echo "-HAL$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(HAL_TOP))"
+endef
+
+# Store (new) HALRELEASE string in include/config/HAL.release
+include/config/HAL.release: include/config/auto.conf FORCE
+	$(call filechk,HAL.release)
 
 # Things we need to do before we recursively start building the kernel
 # or the modules are listed in "prepare".
@@ -1844,7 +1852,7 @@ PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
 # prepare3 is used to check if we are building in a separate output directory,
 # and if so do:
 # 1) Check that make has not been executed in the kernel src $(srctree)
-prepare3: include/config/uboot.release
+prepare3: include/config/uboot.release include/config/HAL.release
 ifneq ($(KBUILD_SRC),)
 	@$(kecho) '  Using $(srctree) as source for U-Boot'
 	$(Q)if [ -f $(srctree)/.config -o -d $(srctree)/include/config ]; then \
@@ -1883,8 +1891,8 @@ prepare: prepare0
 
 # Use sed to remove leading zeros from PATCHLEVEL to avoid using octal numbers
 define filechk_version.h
-	(echo \#define PLAIN_VERSION \"$(UBOOTRELEASE)\"; \
-	echo \#define U_BOOT_VERSION \"U-Boot \" PLAIN_VERSION; \
+	(echo \#define PLAIN_VERSION \"$(UBOOTRELEASE)$(HALRELEASE)\"; \
+	echo \#define EXTRAVERSION \"$(EXTRAVERSION)\"; \
 	echo \#define U_BOOT_VERSION_NUM $(VERSION); \
 	echo \#define U_BOOT_VERSION_NUM_PATCH $$(echo $(PATCHLEVEL) | \
 		sed -e "s/^0*//"); \
@@ -1936,7 +1944,7 @@ define filechk_dt.h
 	fi)
 endef
 
-$(version_h): include/config/uboot.release FORCE
+$(version_h): include/config/uboot.release include/config/HAL.release FORCE
 	$(call filechk,version.h)
 
 $(timestamp_h): $(srctree)/Makefile FORCE
@@ -2247,6 +2255,9 @@ checkstack:
 
 ubootrelease:
 	@echo "$(UBOOTVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
+
+HALrelease:
+	@echo "-HAL$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(HAL_TOP))"
 
 ubootversion:
 	@echo $(UBOOTVERSION)

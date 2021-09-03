@@ -34,11 +34,20 @@
 #define HOST_PORTS_IMPL		0x0c /* bitmap of implemented ports */
 #define HOST_VERSION		0x10 /* AHCI spec. version compliancy */
 #define HOST_CAP2		0x24 /* host capabilities, extended */
+#define	HOST_BISTAFR		0xA0 /* BIST Activate FIS Register */
+#define	HOST_BISTCR		0xA4 /* BIST Control Register */
+#define	HOST_BISTFCTR		0xA8 /* BIST FIS Count Register */
+#define	HOST_BISTSR		0xAC /* BIST Status Register */
+#define	HOST_BISTDECR		0xB0 /* BIST Dword Error Count Register */
+#define HOST_TESTR		0xF4 /* Test Register */
 
 /* HOST_CTL bits */
 #define HOST_RESET		(1 << 0)  /* reset controller; self-clear */
 #define HOST_IRQ_EN		(1 << 1)  /* global IRQ enable */
 #define HOST_AHCI_EN		(1 << 31) /* AHCI enabled */
+
+/* HOST_TESTR bits */
+#define HOST_TESTR_PSEL(dev)	(((dev) & 0x7) << 16)
 
 /* Registers for each SATA port */
 #define PORT_LST_ADDR		0x00 /* command list DMA addr */

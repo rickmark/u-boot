@@ -13,6 +13,7 @@ struct serial_device {
 	int	(*getc)(void);
 	int	(*tstc)(void);
 	void	(*putc)(const char c);
+	void	(*putc_raw)(const char c);
 	void	(*puts)(const char *s);
 #if CONFIG_POST & CONFIG_SYS_POST_UART
 	void	(*loop)(int);

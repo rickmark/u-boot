@@ -130,7 +130,7 @@ struct i2c_regs {
 /* i2c enable register definitions */
 #define IC_ENABLE_0B		0x0001
 
-/* i2c status register  definitions */
+/* i2c status register definitions */
 #define IC_STATUS_SA		0x0040
 #define IC_STATUS_MA		0x0020
 #define IC_STATUS_RFF		0x0010

@@ -9,8 +9,14 @@
 #include "compiler.h"
 
 struct MD5Context {
-	__u32 buf[4];
-	__u32 bits[2];
+/*
+ *  a progress message will be print each step.
+ *  0 = no printing,
+ *  must be a  product of 64 (i.e. 64, 128, ..., 1024*1024, ...)
+ */
+	size_t progress_print_step;
+	__u32  buf[4];
+	__u32  bits[2];
 	union {
 		unsigned char in[64];
 		__u32 in32[16];
@@ -30,5 +36,9 @@ void md5 (unsigned char *input, int len, unsigned char output[16]);
  */
 void md5_wd (unsigned char *input, int len, unsigned char output[16],
 		unsigned int chunk_sz);
+
+/* same function as md5_wd, only with progress messages prints */
+void md5_wd_prog_msg (unsigned char *input, int len, unsigned char output[16],
+                unsigned int chunk_sz, size_t prog_msg_step);
 
 #endif /* _MD5_H */

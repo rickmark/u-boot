@@ -234,6 +234,9 @@ int scsi_scan(bool verbose);
  */
 int scsi_scan_dev(struct udevice *dev, bool verbose);
 
+int scsi_ata_bist(ccb *pccb);
+int scsi_ata_bist_stat(ccb *pccb);
+
 #ifndef CONFIG_DM_SCSI
 void scsi_low_level_init(int busdevfunc);
 void scsi_init(void);

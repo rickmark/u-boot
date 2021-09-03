@@ -221,6 +221,40 @@ IRQ_STACK_START_IN:
 	subs	pc, lr, #4		@ return & move spsr_svc into cpsr
 	.endm
 
+	.macro	abort_save_user_regs
+	sub	sp, sp, #S_FRAME_SIZE
+	stmia	sp, {r0 - r12}			@ Calling r0-r12
+	@ !!!! R8 NEEDS to be saved !!!! a reserved stack spot would be good.
+	add	r8, sp, #S_PC
+	stmdb	r8, {sp, lr}^		@ Calling SP, LR
+	str	lr, [r8, #0]		@ Save calling PC
+	mrs	r6, spsr
+	str	r6, [r8, #4]		@ Save CPSR
+	str	r0, [r8, #8]		@ Save OLD_R0
+	mov	r0, sp
+	.endm
+
+	.macro	abort_restore_user_regs
+	ldmia	sp, {r0 - lr}^			@ Calling r0 - lr
+	mov	r0, r0
+	ldr	lr, [sp, #S_PC]			@ Get PC
+	add	sp, sp, #S_FRAME_SIZE
+	subs	pc, lr, #4		@ return & move spsr_svc into cpsr
+	.endm
+
+	.macro	hyp_abort_save_user_regs
+	push	{r0 - r12, lr}
+	mrs	r6, elr_hyp
+	push	{r6}
+	.endm
+
+	.macro	hyp_abort_restore_user_regs
+	pop	{r6}
+	msr	elr_hyp, r6
+	pop	{r0 - r12, lr}
+	eret
+	.endm
+
 	.macro get_bad_stack
 	ldr	r13, IRQ_STACK_START_IN		@ setup our mode stack
 
@@ -232,6 +266,10 @@ IRQ_STACK_START_IN:
 	msr	spsr, r13	@ switch modes, make sure moves will execute
 	mov	lr, pc		@ capture return pc
 	movs	pc, lr		@ jump to next instruction & switch modes.
+	.endm
+
+	.macro get_abort_stack			@ setup abort stack
+	ldr	sp, IRQ_STACK_START_IN
 	.endm
 
 	.macro get_irq_stack			@ setup IRQ stack
@@ -266,9 +304,18 @@ prefetch_abort:
 
 	.align	5
 data_abort:
-	get_bad_stack
-	bad_save_user_regs
+	get_abort_stack
+	abort_save_user_regs
 	bl	do_data_abort
+	abort_restore_user_regs
+
+	.align	5
+
+.globl data_abort_hyp
+data_abort_hyp:
+	hyp_abort_save_user_regs
+	bl	do_data_abort
+	hyp_abort_restore_user_regs
 
 	.align	5
 not_used:

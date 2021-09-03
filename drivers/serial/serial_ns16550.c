@@ -8,6 +8,11 @@
 #include <clock_legacy.h>
 #include <ns16550.h>
 #include <serial.h>
+
+#ifdef CONFIG_AL_I2C
+#include "al_hal_iomap.h"
+#endif
+
 #include <asm/global_data.h>
 #include <linux/compiler.h>
 
@@ -98,6 +103,10 @@ static struct ns16550 *serial_ports[6] = {
 	{ \
 		serial_putc_dev(port, c); \
 	} \
+	static void eserial##port##_putc_raw(const char c) \
+	{ \
+		serial_putc_raw_dev(port, c); \
+	} \
 	static void eserial##port##_puts(const char *s) \
 	{ \
 		serial_puts_dev(port, s); \
@@ -112,6 +121,7 @@ static struct ns16550 *serial_ports[6] = {
 	.getc	= eserial##port##_getc,		\
 	.tstc	= eserial##port##_tstc,		\
 	.putc	= eserial##port##_putc,		\
+	.putc_raw	= eserial##port##_putc_raw,		\
 	.puts	= eserial##port##_puts,		\
 }
 

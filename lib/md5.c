@@ -56,7 +56,7 @@ byteReverse(unsigned char *buf, unsigned longs)
  * initialization constants.
  */
 static void
-MD5Init(struct MD5Context *ctx)
+MD5Init(struct MD5Context *ctx, size_t print_prog_msg_step)
 {
 	ctx->buf[0] = 0x67452301;
 	ctx->buf[1] = 0xefcdab89;
@@ -65,6 +65,7 @@ MD5Init(struct MD5Context *ctx)
 
 	ctx->bits[0] = 0;
 	ctx->bits[1] = 0;
+	ctx->progress_print_step = print_prog_msg_step;
 }
 
 /*
@@ -74,7 +75,9 @@ MD5Init(struct MD5Context *ctx)
 static void
 MD5Update(struct MD5Context *ctx, unsigned char const *buf, unsigned len)
 {
+	const int bytes_chunk = ctx->progress_print_step / 64;
 	register __u32 t;
+	size_t         i = 0;
 
 	/* Update bitcount */
 
@@ -104,6 +107,8 @@ MD5Update(struct MD5Context *ctx, unsigned char const *buf, unsigned len)
 	/* Process data in 64-byte chunks */
 
 	while (len >= 64) {
+		if ( bytes_chunk && !(i++ % bytes_chunk) )
+			printf("md5 bytes left: %d\n", len);
 		memmove(ctx->in, buf, 64);
 		byteReverse(ctx->in, 16);
 		MD5Transform(ctx->buf, (__u32 *) ctx->in);
@@ -263,29 +268,10 @@ MD5Transform(__u32 buf[4], __u32 const in[16])
 	buf[3] += d;
 }
 
-/*
- * Calculate and store in 'output' the MD5 digest of 'len' bytes at
- * 'input'. 'output' must have enough space to hold 16 bytes.
- */
-void
-md5 (unsigned char *input, int len, unsigned char output[16])
-{
-	struct MD5Context context;
 
-	MD5Init(&context);
-	MD5Update(&context, input, len);
-	MD5Final(output, &context);
-}
-
-
-/*
- * Calculate and store in 'output' the MD5 digest of 'len' bytes at 'input'.
- * 'output' must have enough space to hold 16 bytes. If 'chunk' Trigger the
- * watchdog every 'chunk_sz' bytes of input processed.
- */
-void
-md5_wd (unsigned char *input, int len, unsigned char output[16],
-	unsigned int chunk_sz)
+static void
+md5_wd_aux(unsigned char *input, int len, unsigned char output[16],
+                unsigned int chunk_sz, size_t print_prog_msg_flag)
 {
 	struct MD5Context context;
 #if defined(CONFIG_HW_WATCHDOG) || defined(CONFIG_WATCHDOG)
@@ -293,7 +279,7 @@ md5_wd (unsigned char *input, int len, unsigned char output[16],
 	int chunk;
 #endif
 
-	MD5Init(&context);
+	MD5Init(&context, print_prog_msg_flag);
 
 #if defined(CONFIG_HW_WATCHDOG) || defined(CONFIG_WATCHDOG)
 	curr = input;
@@ -311,4 +297,38 @@ md5_wd (unsigned char *input, int len, unsigned char output[16],
 #endif
 
 	MD5Final(output, &context);
+}
+
+/*
+ * Calculate and store in 'output' the MD5 digest of 'len' bytes at
+ * 'input'. 'output' must have enough space to hold 16 bytes.
+ */
+void
+md5 (unsigned char *input, int len, unsigned char output[16])
+{
+	struct MD5Context context;
+
+	MD5Init(&context, 0);
+	MD5Update(&context, input, len);
+	MD5Final(output, &context);
+}
+
+
+/*
+ * Calculate and store in 'output' the MD5 digest of 'len' bytes at 'input'.
+ * 'output' must have enough space to hold 16 bytes. If 'chunk' Trigger the
+ * watchdog every 'chunk_sz' bytes of input processed.
+ */
+void
+md5_wd (unsigned char *input, int len, unsigned char output[16],
+	unsigned int chunk_sz)
+{
+	md5_wd_aux(input, len, output, chunk_sz, 0);
+}
+/* same function as md5_wd, only with progress messages prints */
+void
+md5_wd_prog_msg(unsigned char *input, int len, unsigned char output[16],
+                unsigned int chunk_sz, size_t prog_msg_step)
+{
+	md5_wd_aux(input, len, output, chunk_sz, prog_msg_step);
 }

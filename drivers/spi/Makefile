@@ -17,6 +17,15 @@ obj-y += spi.o
 obj-$(CONFIG_SPI_MEM) += spi-mem-nodm.o
 endif
 
+ifeq ($(CONFIG_AL_SPI),y)
+-include $(HAL_TOP)/file_list_base.mk
+ccflags-y += -Iboard/$(CONFIG_SYS_VENDOR)/common/
+ccflags-y += $(HAL_USER_INCLUDE_PATH)
+ccflags-$(CONFIG_ALPINE) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V1)
+ccflags-$(CONFIG_ALPINE_V2_32) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V2)
+ccflags-$(CONFIG_ALPINE_V2_64) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V2)
+endif
+
 obj-$(CONFIG_ALTERA_SPI) += altera_spi.o
 obj-$(CONFIG_ATH79_SPI) += ath79_spi.o
 obj-$(CONFIG_ATMEL_QSPI) += atmel-quadspi.o
@@ -71,3 +80,4 @@ obj-$(CONFIG_XILINX_SPI) += xilinx_spi.o
 obj-$(CONFIG_ZYNQ_SPI) += zynq_spi.o
 obj-$(CONFIG_ZYNQ_QSPI) += zynq_qspi.o
 obj-$(CONFIG_ZYNQMP_GQSPI) += zynqmp_gqspi.o
+obj-$(CONFIG_AL_SPI) += al_spi.o

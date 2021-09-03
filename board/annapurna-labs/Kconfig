@@ -1,0 +1,52 @@
+choice
+	prompt "Alpine board select"
+
+config TARGET_ALPINE_DB
+	bool "Alpine development board"
+
+config TARGET_ALPINE_V2_32_DB
+	bool "Alpine V2 development board - 32 bits"
+
+config TARGET_ALPINE_V2_64_DB
+	bool "Alpine V2 development board - 64 bits"
+
+endchoice
+
+if TARGET_ALPINE_DB
+
+config SYS_BOARD
+	default "alpine_db"
+
+config SYS_CONFIG_NAME
+	default "alpine_db"
+
+config SYS_TEXT_BASE
+	default 0xfff00000
+
+endif
+
+if TARGET_ALPINE_V2_32_DB
+
+config SYS_BOARD
+	default "alpine_db"
+
+config SYS_CONFIG_NAME
+	default "alpine_v2_32_db"
+
+config SYS_TEXT_BASE
+	default 0xfff00000
+
+endif
+
+if TARGET_ALPINE_V2_64_DB
+
+config SYS_BOARD
+	default "alpine_db"
+
+config SYS_CONFIG_NAME
+	default "alpine_v2_64_db"
+
+config SYS_TEXT_BASE
+	default 0xfff00000
+
+endif

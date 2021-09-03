@@ -1,0 +1,15 @@
+diff a/drivers/serial/Makefile b/drivers/serial/Makefile	(rejected hunks)
+@@ -5,6 +5,13 @@
+ # SPDX-License-Identifier:	GPL-2.0+
+ #
+ 
++ifeq ($(CONFIG_AL_I2C),y)
++-include $(HAL_TOP)/file_list_base.mk
++ccflags-$(CONFIG_ALPINE) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V1)
++ccflags-$(CONFIG_ALPINE_V2_32) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V2)
++ccflags-$(CONFIG_ALPINE_V2_64) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V2)
++endif
++
+ ifdef CONFIG_DM_SERIAL
+ obj-y += serial-uclass.o
+ obj-$(CONFIG_PL01X_SERIAL) += serial_pl01x.o

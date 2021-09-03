@@ -42,7 +42,18 @@ ENTRY(relocate_vectors)
 	 * use VBAR to relocate the exception vectors.
 	 */
 	ldr	r0, [r9, #GD_RELOCADDR]	/* r0 = gd->relocaddr */
-	mcr     p15, 0, r0, c12, c0, 0  /* Set VBAR */
+	mrs	r1, cpsr
+	and	r1, r1, #0x1f		/* mask mode bits */
+	teq	r1, #0x1a		/* test for HYP mode */
+	beq	1f
+	mcr	p15, 0, r0, c12, c0, 0  /* Set VBAR */
+	b	2f
+1:
+	mcr	p15, 4, r0, c12, c0, 0  /* Set HVBAR */
+	ldr	r2, =_data_abort
+	ldr	r1, =data_abort_hyp
+	str	r1, [r2]
+2:
 #else
 	/*
 	 * Copy the relocated exception vectors to the

@@ -168,6 +168,10 @@ struct global_data {
 	 */
 	unsigned long mon_len;
 	/**
+	 * @abort_sp: Abort stack poniter
+	 */
+	unsigned long abort_sp;
+	/**
 	 * @irq_sp: IRQ stack pointer
 	 */
 	unsigned long irq_sp;

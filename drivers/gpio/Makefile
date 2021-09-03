@@ -69,3 +69,16 @@ obj-$(CONFIG_MSCC_SGPIO)	+= mscc_sgpio.o
 obj-$(CONFIG_NX_GPIO)		+= nx_gpio.o
 obj-$(CONFIG_SIFIVE_GPIO)	+= sifive-gpio.o
 obj-$(CONFIG_NOMADIK_GPIO)	+= nmk_gpio.o
+
+
+ifeq ($(CONFIG_AL_GPIO),y)
+-include $(HAL_TOP)/file_list_base.mk
+ccflags-y += -Iarch/$(CONFIG_SYS_ARCH)/include/asm/arch-$(CONFIG_SYS_SOC)/
+ccflags-y += -Iboard/$(CONFIG_SYS_VENDOR)/common/
+ccflags-y += $(HAL_USER_INCLUDE_PATH)
+ccflags-$(CONFIG_ALPINE) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V1)
+ccflags-$(CONFIG_ALPINE_V2_32) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V2)
+ccflags-$(CONFIG_ALPINE_V2_64) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V2)
+endif
+
+obj-$(CONFIG_AL_GPIO)		+= al_gpio.o

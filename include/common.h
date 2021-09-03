@@ -27,6 +27,27 @@
 #include <vsprintf.h>
 #endif	/* __ASSEMBLY__ */
 
+#ifndef CONFIG_ENV_IS_DYNAMIC
+#if defined(CONFIG_ENV_IS_IN_NAND)
+#define env_init		env_nand_init
+#define env_saveenv		env_nand_saveenv
+#define readenv			env_nand_readenv
+#define env_relocate_spec	env_nand_relocate_spec
+
+#elif defined(CONFIG_ENV_IS_IN_SPI_FLASH)
+#define env_init 		env_sf_init
+#define env_saveenv 		env_sf_saveenv
+#define env_relocate_spec	env_sf_relocate_spec
+
+#elif defined(CONFIG_ENV_IS_NOWHERE)
+#define env_init 		env_nowhere_init
+#define env_relocate_spec	env_nowhere_relocate_spec
+
+#endif
+
+#endif /* CONFIG_ENV_IS_DYNAMIC */
+
+
 /* Pull in stuff for the build system */
 #ifdef DO_DEPS_ONLY
 # include <env_internal.h>

@@ -1917,6 +1917,19 @@ config TI_SECURE_DEVICE
 	  authenticated) and the code. See the doc/README.ti-secure
 	  file for further details.
 
+config ALPINE
+	bool "Annapurna Labs Alpine"
+	select CPU_V7
+
+config ALPINE_V2_32
+	bool "Annapurna Labs Alpine V2 32 bits"
+	select CPU_V7
+
+config ALPINE_V2_64
+	bool "Annapurna Labs Alpine V2 64 bits"
+	select ARM64
+
+
 if AM43XX || AM33XX || OMAP54XX || ARCH_KEYSTONE
 config ISW_ENTRY_ADDR
 	hex "Address in memory or XIP address of bootloader entry point"
@@ -2040,6 +2053,12 @@ source "arch/arm/cpu/armv7/Kconfig"
 
 source "arch/arm/cpu/armv8/Kconfig"
 
+source "arch/arm/cpu/armv7/alpine/Kconfig"
+
+source "arch/arm/cpu/armv7/alpine_v2/Kconfig"
+
+source "arch/arm/cpu/armv8/alpine_v2/Kconfig"
+
 source "arch/arm/mach-imx/Kconfig"
 
 source "arch/arm/mach-nexell/Kconfig"
@@ -2095,6 +2114,7 @@ source "board/vscom/baltos/Kconfig"
 source "board/phytium/durian/Kconfig"
 source "board/xen/xenguest_arm64/Kconfig"
 source "board/keymile/Kconfig"
+source "board/annapurna-labs/Kconfig"
 
 source "arch/arm/Kconfig.debug"
 

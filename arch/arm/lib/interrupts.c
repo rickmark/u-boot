@@ -29,12 +29,19 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+unsigned int data_abort_is_slient = 0;
+unsigned int num_data_aborts = 0;
+
 int interrupt_init(void)
 {
 	/*
 	 * setup up stacks if necessary
 	 */
-	IRQ_STACK_START_IN = gd->irq_sp + 8;
+#ifndef CONFIG_STACKSIZE_ABORT
+ 	IRQ_STACK_START_IN = gd->irq_sp + 8;
+#else
+	IRQ_STACK_START_IN = gd->abort_sp - 4;
+#endif
 
 	enable_interrupts();
 
@@ -168,6 +175,12 @@ void do_prefetch_abort (struct pt_regs *pt_regs)
 void do_data_abort (struct pt_regs *pt_regs)
 {
 	efi_restore_gd();
+
+	if (data_abort_is_slient) {
+		num_data_aborts++;
+		return;
+	}
+	
 	printf ("data abort\n");
 	fixup_pc(pt_regs, -8);
 	show_regs (pt_regs);

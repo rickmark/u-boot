@@ -254,6 +254,36 @@ static __always_inline void eth_halt_state_only(void)
 int eth_write_hwaddr(struct eth_device *dev, const char *base_name,
 		     int eth_number);
 
+/*
+ * Set the hardware address environment variable for an ethernet interface .
+ * Args:
+ *	base_name - base name for device (normally "eth")
+ *	index - device index number (0 for first)
+ *	enetaddr - 6 byte hardware address
+ * Returns:
+ *	Return true if no error
+ */
+extern int eth_setenv_enetaddr_by_index(const char *base_name, int index,
+					uchar *enetaddr);
+
+#ifdef CONFIG_RANDOM_MACADDR
+/*
+ * The u-boot policy does not allow hardcoded ethernet addresses. Under the
+ * following circumstances a random generated address is allowed:
+ *  - in emergency cases, where you need a working network connection to set
+ *    the ethernet address.
+ *    Eg. you want a rescue boot and don't have a serial port to access the
+ *    CLI to set environment variables.
+ *
+ * In these cases, we generate a random locally administered ethernet address.
+ *
+ * Args:
+ *  enetaddr - returns 6 byte hardware address
+ */
+extern void eth_random_enetaddr(uchar *enetaddr);
+#endif
+
+
 int usb_eth_initialize(struct bd_info *bi);
 #endif
 

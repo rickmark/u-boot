@@ -3,6 +3,15 @@
 # (C) Copyright 2006
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
 
+ifeq ($(CONFIG_AL_ETH),y)
+-include $(HAL_TOP)/file_list_base.mk
+ccflags-y += -Iboard/$(CONFIG_SYS_VENDOR)/common/
+ccflags-y += $(HAL_USER_INCLUDE_PATH) $(HAL_DRIVER_INCLUDE_PATH) $(HAL_INIT_INCLUDE_PATH)
+ccflags-$(CONFIG_ALPINE) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V1)
+ccflags-$(CONFIG_ALPINE_V2_32) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V2)
+ccflags-$(CONFIG_ALPINE_V2_64) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V2)
+endif
+
 obj-$(CONFIG_ALTERA_TSE) += altera_tse.o
 obj-$(CONFIG_AG7XXX) += ag7xxx.o
 obj-$(CONFIG_ARMADA100_FEC) += armada100_fec.o
@@ -99,3 +108,4 @@ obj-$(CONFIG_HIGMACV300_ETH) += higmacv300.o
 obj-$(CONFIG_MDIO_SANDBOX) += mdio_sandbox.o
 obj-$(CONFIG_FSL_ENETC) += fsl_enetc.o fsl_enetc_mdio.o
 obj-$(CONFIG_FSL_LS_MDIO) += fsl_ls_mdio.o
+obj-$(CONFIG_AL_ETH) += al_eth_pci.o al_eth.o

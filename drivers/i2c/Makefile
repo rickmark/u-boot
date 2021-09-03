@@ -2,6 +2,15 @@
 #
 # (C) Copyright 2000-2007
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
+
+ifeq ($(CONFIG_AL_I2C),y)
+-include $(HAL_TOP)/file_list_base.mk
+ccflags-$(CONFIG_ALPINE) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V1)
+ccflags-$(CONFIG_ALPINE_V2_32) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V2)
+ccflags-$(CONFIG_ALPINE_V2_64) += $(HAL_PLATFORM_INCLUDE_PATH_ALPINE_V2)
+endif
+
+
 obj-$(CONFIG_$(SPL_)DM_I2C) += i2c-uclass.o
 ifdef CONFIG_ACPIGEN
 obj-$(CONFIG_$(SPL_)DM_I2C) += acpi_i2c.o
